@@ -60,7 +60,7 @@ def place_entities(
 def tunnel_between(
         start: Tuple[int, int], end: Tuple[int, int]
 ) -> Iterator[Tuple[int, int]]:
-    """Return an L-shaped tunnel between thse two points."""
+    """Return an L-shaped tunnel between these two points."""
     x1, y1 = start
     x2, y2 = end
     if random.random() < 0.5:  # 50% chance

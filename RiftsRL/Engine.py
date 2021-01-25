@@ -1,34 +1,55 @@
-from typing import Set, Iterable, Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from tcod.context import Context
 from tcod.console import Console
+from tcod.map import compute_fov
+from message_log import MessageLog
 
-from entity import Entity
-from game_map import GameMap
-from input_handlers import EventHandler
+from input_handlers import MainGameEventHandler
+from render_functions import render_bar
+
+if TYPE_CHECKING:
+    from entity import Actor
+    from game_map import GameMap
+    from input_handlers import EventHandler
 
 
 class Engine:
-    def __init__(self, entities: Set[Entity], event_handler: EventHandler, game_map: GameMap, player: Entity):
-        self.entities = entities
-        self.event_handler = event_handler
-        self.game_map = game_map
+    game_map: GameMap
+
+    def __init__(self, player: Actor):
+        self.event_handler: EventHandler = MainGameEventHandler(self)
+        self.message_log = MessageLog()
         self.player = player
 
-    def handle_events(self, events: Iterable[Any]) -> None:
-        for event in events:
-            action = self.event_handler.dispatch(event)
+    def handle_enemy_turns(self) -> None:
+        for entity in self.game_map.entities - {self.player}:
+            if entity.ai:
+                entity.ai.perform()
 
-            if action is None:
-                continue
-
-            action.perform(self, self.player)
+    def update_fov(self) -> None:
+        """Recompute the visible area based ont eh players point of view"""
+        self.game_map.visible[:] = compute_fov(
+            self.game_map.tiles["transparent"],
+            (self.player.x, self.player.y),
+            radius=8,
+        )
+        #  If a tile is "visible" it should be added to the "explored".
+        self.game_map.explored |= self.game_map.visible
 
     def render(self, console: Console, context: Context) -> None:
         self.game_map.render(console)
 
-        for entity in self.entities:
-            console.print(entity.x, entity.y, entity.char, fg=entity.color)
+        self.message_log.render(console=console, x=21, y=45, width=40, height=5)
+
+        render_bar(
+            console=console,
+            current_value=self.player.fighter.hp,
+            maximum_value=self.player.fighter.max_hp,
+            total_width=20,
+        )
 
         context.present(console)
 

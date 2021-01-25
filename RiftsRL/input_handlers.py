@@ -88,6 +88,7 @@ class MainGameEventHandler(EventHandler):
         # No valid key was pressed
         return action
 
+
 class GameOverEventHandler(EventHandler):
     def handle_events(self) -> None:
         for event in tcod.event.wait():
