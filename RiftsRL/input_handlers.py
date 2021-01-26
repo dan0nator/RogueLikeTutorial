@@ -2,15 +2,10 @@ from __future__ import annotations
 
 import os
 
-from typing import (
-    Callable,
-    Optional,
-    Tuple,
-    TYPE_CHECKING,
-    Union,
-)
+from typing import Callable, Optional, Tuple, TYPE_CHECKING, Union
 
-import tcod.event
+import tcod
+
 import actions
 from actions import (
     Action,
@@ -18,13 +13,13 @@ from actions import (
     PickupAction,
     WaitAction,
 )
-
 import color
 import exceptions
 
 if TYPE_CHECKING:
     from engine import Engine
     from entity import Item
+
 
 MOVE_KEYS = {
     # Arrow keys.
@@ -69,7 +64,6 @@ CONFIRM_KEYS = {
 
 ActionOrHandler = Union[Action, "BaseEventHandler"]
 """An event handler return value which can trigger an action or switch active handlers.
-
 If a handler is returned then it will become the active handler for future events.
 If an action is returned it will be attempted and if it's valid then
 MainGameEventHandler will become the active handler.
@@ -138,7 +132,6 @@ class EventHandler(BaseEventHandler):
 
     def handle_action(self, action: Optional[Action]) -> bool:
         """Handle actions returned from event methods.
-
         Returns True if the action will advance a turn.
         """
         if action is None:
@@ -180,14 +173,13 @@ class AskUserEventHandler(EventHandler):
         return self.on_exit()
 
     def ev_mousebuttondown(
-            self, event: tcod.event.MouseButtonDown
+        self, event: tcod.event.MouseButtonDown
     ) -> Optional[ActionOrHandler]:
         """By default any mouse click exits this input handler."""
         return self.on_exit()
 
     def on_exit(self) -> Optional[ActionOrHandler]:
         """Called when the user is trying to exit or cancel an action.
-
         By default this returns to the main event handler.
         """
         return MainGameEventHandler(self.engine)
@@ -195,7 +187,6 @@ class AskUserEventHandler(EventHandler):
 
 class InventoryEventHandler(AskUserEventHandler):
     """This handler lets the user select an item.
-
     What happens then depends on the subclass.
     """
 
@@ -294,7 +285,7 @@ class SelectIndexHandler(AskUserEventHandler):
         super().on_render(console)
         x, y = self.engine.mouse_location
         console.tiles_rgb["bg"][x, y] = color.white
-        console.tiles_rgb["fc"][x, y] = color.black
+        console.tiles_rgb["fg"][x, y] = color.black
 
     def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[ActionOrHandler]:
         """Check for key movement or confirmation keys."""
@@ -321,7 +312,9 @@ class SelectIndexHandler(AskUserEventHandler):
             return self.on_index_selected(*self.engine.mouse_location)
         return super().ev_keydown(event)
 
-    def ev_mousebuttondown(self, event: tcod.event.MouseButtonDown) -> Optional[ActionOrHandler]:
+    def ev_mousebuttondown(
+        self, event: tcod.event.MouseButtonDown
+    ) -> Optional[ActionOrHandler]:
         """Left click confirms a selection."""
         if self.engine.game_map.in_bounds(*event.tile):
             if event.button == 1:
@@ -345,7 +338,7 @@ class SingleRangedAttackHandler(SelectIndexHandler):
     """Handles targeting a single enemy. Only the enemy selected will be affected."""
 
     def __init__(
-            self, engine: Engine, callback: Callable[[Tuple[int, int]], Optional[Action]]
+        self, engine: Engine, callback: Callable[[Tuple[int, int]], Optional[Action]]
     ):
         super().__init__(engine)
 
@@ -359,10 +352,10 @@ class AreaRangedAttackHandler(SelectIndexHandler):
     """Handles targeting an area within a given radius. Any entity within the area will be affected."""
 
     def __init__(
-            self,
-            engine: Engine,
-            radius: int,
-            callback: Callable[[Tuple[int, int]], Optional[Action]],
+        self,
+        engine: Engine,
+        radius: int,
+        callback: Callable[[Tuple[int, int]], Optional[Action]],
     ):
         super().__init__(engine)
 
@@ -402,12 +395,15 @@ class MainGameEventHandler(EventHandler):
             action = BumpAction(player, dx, dy)
         elif key in WAIT_KEYS:
             action = WaitAction(player)
+
         elif key == tcod.event.K_ESCAPE:
             raise SystemExit()
         elif key == tcod.event.K_v:
             return HistoryViewer(self.engine)
+
         elif key == tcod.event.K_g:
             action = PickupAction(player)
+
         elif key == tcod.event.K_i:
             return InventoryActivateHandler(self.engine)
         elif key == tcod.event.K_d:
@@ -452,6 +448,7 @@ class HistoryViewer(EventHandler):
 
     def on_render(self, console: tcod.Console) -> None:
         super().on_render(console)  # Draw the main state as the background.
+
         log_console = tcod.Console(console.width - 6, console.height - 6)
 
         # Draw a frame with a custom banner title.
@@ -490,3 +487,4 @@ class HistoryViewer(EventHandler):
             self.cursor = self.log_length - 1  # Move directly to the last message.
         else:  # Any other key moves back to the main game state.
             return MainGameEventHandler(self.engine)
+        return None
