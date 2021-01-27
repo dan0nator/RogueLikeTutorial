@@ -186,6 +186,7 @@ class AskUserEventHandler(EventHandler):
         """
         return MainGameEventHandler(self.engine)
 
+
 class CharacterScreenEventHandler(AskUserEventHandler):
     TITLE = "Character Information"
 
@@ -293,7 +294,7 @@ class LevelUpEventHandler(AskUserEventHandler):
         return super().ev_keydown(event)
 
     def ev_mousebuttondown(
-            self, event: tcod.event.MouseButtonDown
+        self, event: tcod.event.MouseButtonDown
     ) -> Optional[ActionOrHandler]:
         """
         Don't allow the player to click to exit the menu, like normal.
@@ -525,12 +526,13 @@ class MainGameEventHandler(EventHandler):
 
         elif key == tcod.event.K_g:
             action = PickupAction(player)
-        elif key == tcod.event.K_c:
-            return CharacterScreenEventHandler(self.engine)
+
         elif key == tcod.event.K_i:
             return InventoryActivateHandler(self.engine)
         elif key == tcod.event.K_d:
             return InventoryDropHandler(self.engine)
+        elif key == tcod.event.K_c:
+            return CharacterScreenEventHandler(self.engine)
         elif key == tcod.event.K_SLASH:
             return LookHandler(self.engine)
 
