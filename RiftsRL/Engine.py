@@ -10,7 +10,7 @@ from tcod.map import compute_fov
 
 import exceptions
 from message_log import MessageLog
-import  render_functions
+import render_functions
 
 
 if TYPE_CHECKING:
