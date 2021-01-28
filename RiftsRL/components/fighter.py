@@ -14,11 +14,21 @@ if TYPE_CHECKING:
 class Fighter(BaseComponent):
     parent: Actor
 
-    def __init__(self, hp: int, base_defense: int, base_power: int):
+    def __init__(self, hp: int, base_defense: int, base_power: int, calories: int):
         self.max_hp = hp
         self._hp = hp
         self.base_defense = base_defense
         self.base_power = base_power
+        self.max_calories = calories
+        self._calories = calories
+
+    @property
+    def calories(self) -> int:
+        return self._calories
+
+    @calories.setter
+    def calories(self, value: int) -> None:
+        self._calories = max(0, min(value, self.max_calories))
 
     @property
     def hp(self) -> int:
@@ -86,5 +96,24 @@ class Fighter(BaseComponent):
 
         return amount_recovered
 
+    def eat(self, amount: int) -> int:
+        if self.calories == self.max_calories:
+            return 100
+
+        new_calories_value = self.calories + amount
+
+        if new_calories_value > self.max_calories:
+            new_calories_value = self.max_calories
+
+        self.calories = new_calories_value
+
+        # return percentage of new_calories_value vs max_calories
+        q = new_calories_value / self.max_calories
+        p = round(q * 100)
+        return p
+
     def take_damage(self, amount: int) -> None:
         self.hp -= amount
+
+    def burn_callories(self, amount: int) -> None:
+        self.calories -= amount

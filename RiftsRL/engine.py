@@ -12,7 +12,6 @@ import exceptions
 from message_log import MessageLog
 import render_functions
 
-
 if TYPE_CHECKING:
     from entity import Actor
     from game_map import GameMap, GameWorld
@@ -50,17 +49,31 @@ class Engine:
 
         self.message_log.render(console=console, x=21, y=45, width=40, height=5)
 
+        # render the health bar
         render_functions.render_bar(
             console=console,
             current_value=self.player.fighter.hp,
             maximum_value=self.player.fighter.max_hp,
             total_width=20,
+            location=(0, 45),
+            bar_type="HP",
         )
+        # render the hunger bar
+        render_functions.render_bar(
+            console=console,
+            current_value=self.player.fighter.calories,
+            maximum_value=self.player.fighter.max_calories,
+            total_width=20,
+            location=(0, 46),
+            bar_type="Calories",
+        )
+
         render_functions.render_dungeon_level(
             console=console,
             dungeon_level=self.game_world.current_floor,
-            location=(0,47),
+            location=(0, 47),
         )
+
         render_functions.render_names_at_mouse_location(
             console=console,
             x=21,

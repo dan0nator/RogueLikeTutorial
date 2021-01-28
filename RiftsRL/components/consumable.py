@@ -91,6 +91,33 @@ class HealingConsumable(Consumable):
             raise Impossible(f"Your health is already full.")
 
 
+class FoodConsumable(Consumable):
+    def __init__(self, amount: int):
+        self.amount = amount
+
+    def activate(self, action: actions.ItemAction) -> None:
+        consumer = action.entity
+        hunger_level = consumer.fighter.eat(self.amount)
+        if hunger_level == 100:
+            raise Impossible(f"Your are too full to eat any more.")
+
+        elif hunger_level < 30:
+            self.engine.message_log.add_message(
+                f"You consume the {self.parent.name}, and your still Hungry",
+                color.health_recovered,
+            )
+            self.consume()
+        elif hunger_level < 90:
+            self.engine.message_log.add_message(
+                f"You consume the {self.parent.name}, and your Full",
+                color.health_recovered,
+            )
+            self.consume()
+        else:
+            raise Impossible(f"Your are full and Feel Sluggish.")
+            self.consume()
+
+
 class FireballDamageConsumable(Consumable):
     def __init__(self, damage: int, radius: int):
         self.damage = damage

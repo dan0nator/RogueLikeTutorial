@@ -50,6 +50,7 @@ class PickupAction(Action):
                 inventory.items.append(item)
 
                 self.engine.message_log.add_message(f"You picked up the {item.name}!")
+                self.entity.entity.fighter.burn_callories(2)
                 return
 
         raise exceptions.Impossible("There is nothing here to pick up.")
@@ -92,6 +93,7 @@ class EquipAction(Action):
 
     def perform(self) -> None:
         self.entity.equipment.toggle_equip(self.item)
+        self.entity.fighter.burn_callories(2)
 
 
 class WaitAction(Action):
@@ -109,6 +111,7 @@ class TakeStairsAction(Action):
             self.engine.message_log.add_message(
                 "You descend the staircase.", color.descend
             )
+            self.entity.fighter.burn_callories(5)
         else:
             raise exceptions.Impossible("There are no stairs here.")
 
@@ -158,6 +161,7 @@ class MeleeAction(ActionWithDirection):
                 f"{attack_desc} for {damage} hit points.", attack_color
             )
             target.fighter.hp -= damage
+            self.entity.fighter.burn_callories(10)
         else:
             self.engine.message_log.add_message(
                 f"{attack_desc} but does no damage.", attack_color
@@ -179,6 +183,7 @@ class MovementAction(ActionWithDirection):
             raise exceptions.Impossible("That way is blocked.")
 
         self.entity.move(self.dx, self.dy)
+        self.entity.fighter.burn_callories(1)
 
 
 class BumpAction(ActionWithDirection):

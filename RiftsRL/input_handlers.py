@@ -206,7 +206,7 @@ class CharacterScreenEventHandler(AskUserEventHandler):
             x=x,
             y=y,
             width=width,
-            height=7,
+            height=8,
             title=self.TITLE,
             clear=True,
             fg=(255, 255, 255),
@@ -230,6 +230,9 @@ class CharacterScreenEventHandler(AskUserEventHandler):
         )
         console.print(
             x=x + 1, y=y + 5, string=f"Defense: {self.engine.player.fighter.defense}"
+        )
+        console.print(
+            x=x + 1, y=y + 6, string=f"Hunger: {self.engine.player.fighter.calories}"
         )
 
 

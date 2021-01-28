@@ -12,7 +12,7 @@ player = Actor(
     name="Player",
     ai_cls=HostileEnemy,
     equipment=Equipment(),
-    fighter=Fighter(hp=30, base_defense=2, base_power=5),
+    fighter=Fighter(hp=30, calories=1000, base_defense=2, base_power=5),
     inventory=Inventory(capacity=26),
     level=Level(level_up_base=200),
 )
@@ -23,7 +23,7 @@ orc = Actor(
     name="Orc",
     ai_cls=HostileEnemy,
     equipment=Equipment(),
-    fighter=Fighter(hp=10, base_defense=0, base_power=3),
+    fighter=Fighter(hp=10, calories=1000, base_defense=0, base_power=3),
     inventory=Inventory(capacity=0),
     level=Level(xp_given=35),
 )
@@ -33,7 +33,7 @@ troll = Actor(
     name="Troll",
     ai_cls=HostileEnemy,
     equipment=Equipment(),
-    fighter=Fighter(hp=16, base_defense=1, base_power=4),
+    fighter=Fighter(hp=16, calories=1000, base_defense=1, base_power=4),
     inventory=Inventory(capacity=0),
     level=Level(xp_given=100)
 
@@ -44,6 +44,13 @@ health_potion = Item(
     color=(127, 0, 255),
     name="Health Potion",
     consumable=consumable.HealingConsumable(amount=4),
+)
+
+chunk_of_meat = Item(
+    char="f",
+    color=(170, 150, 50),
+    name="Chunk of Meat",
+    consumable=consumable.FoodConsumable(amount=300),
 )
 
 confusion_scroll = Item(
