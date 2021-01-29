@@ -101,13 +101,13 @@ class FoodConsumable(Consumable):
         if hunger_level == 100:
             raise Impossible(f"Your are too full to eat any more.")
 
-        elif hunger_level < 30:
+        elif hunger_level < 50:
             self.engine.message_log.add_message(
                 f"You consume the {self.parent.name}, and your still Hungry",
                 color.health_recovered,
             )
             self.consume()
-        elif hunger_level < 90:
+        elif hunger_level < 95:
             self.engine.message_log.add_message(
                 f"You consume the {self.parent.name}, and your Full",
                 color.health_recovered,

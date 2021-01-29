@@ -2,6 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import logging, sys
+
+from tcod import console
+
 import color
 
 from components.base_component import BaseComponent
@@ -104,7 +108,7 @@ class Fighter(BaseComponent):
 
         if new_calories_value > self.max_calories:
             new_calories_value = self.max_calories
-
+        logging.debug(f"{new_calories_value}")
         self.calories = new_calories_value
 
         # return percentage of new_calories_value vs max_calories
@@ -115,5 +119,5 @@ class Fighter(BaseComponent):
     def take_damage(self, amount: int) -> None:
         self.hp -= amount
 
-    def burn_callories(self, amount: int) -> None:
+    def burn_calories(self, amount: int) -> None:
         self.calories -= amount
